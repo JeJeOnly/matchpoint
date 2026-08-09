@@ -8,16 +8,36 @@
 </head>
 <body>
 <div class="bg-court" aria-hidden="true"></div>
+<div class="bg-lines" aria-hidden="true"></div>
 
 <header class="top">
   <div class="brand">
-    <span class="brand-mark">&#127934;</span>
-    <span class="brand-name">MatchPoint</span>
+    <span class="brand-ball" aria-hidden="true">
+      <svg viewBox="0 0 34 34" width="36" height="36">
+        <defs>
+          <radialGradient id="ballGrad" cx="35%" cy="30%" r="75%">
+            <stop offset="0%" stop-color="#f2ff9e"/>
+            <stop offset="100%" stop-color="#a9d92b"/>
+          </radialGradient>
+        </defs>
+        <circle cx="17" cy="17" r="15.5" fill="url(#ballGrad)"/>
+        <path d="M4 8 C13 13, 13 21, 4 26" stroke="#fbffe8" stroke-width="1.6" fill="none" opacity="0.9"/>
+        <path d="M30 8 C21 13, 21 21, 30 26" stroke="#fbffe8" stroke-width="1.6" fill="none" opacity="0.9"/>
+      </svg>
+    </span>
+    <h1 class="brand-name">Match<span class="brand-accent">Point</span></h1>
   </div>
-  <p class="tagline">Head-to-head win probability, built from a point-by-point tennis simulation.</p>
+  <p class="tagline">Win probability for any two players &mdash; by surface, with head-to-head history, computed from a point-by-point tennis simulation.</p>
+  <div class="badge-row">
+    <span class="badge">&#127934; ATP &amp; WTA players</span>
+    <span class="badge">&#127978; Hard, clay &amp; grass</span>
+    <span class="badge">&#128202; Head-to-head history</span>
+  </div>
 </header>
 
 <main class="wrap">
+
+  <datalist id="players-list"></datalist>
 
   <section class="card picker-card">
     <div class="picker-grid">
@@ -52,13 +72,19 @@
 
     </div>
 
-    <datalist id="players-list"></datalist>
-
     <div class="controls-row">
       <div class="best-of" role="radiogroup" aria-label="Match format">
         <button type="button" class="bo-btn is-active" data-best-of="3">Best of 3</button>
         <button type="button" class="bo-btn" data-best-of="5">Best of 5</button>
       </div>
+      <div class="surface-picker" role="radiogroup" aria-label="Court surface">
+        <button type="button" class="surf-btn surf-hard is-active" data-surface="hard">Hard</button>
+        <button type="button" class="surf-btn surf-clay" data-surface="clay">Clay</button>
+        <button type="button" class="surf-btn surf-grass" data-surface="grass">Grass</button>
+      </div>
+    </div>
+
+    <div class="controls-row">
       <button id="predict-btn" class="predict-btn" type="button">
         <span>Predict winner</span>
       </button>
@@ -69,6 +95,7 @@
 
   <section id="result" class="card result-card" hidden>
 
+    <span id="result-surface-tag" class="surface-tag surf-tag-hard">Hard court</span>
     <p class="result-headline"><span id="favorite-name">&mdash;</span> favored to win, <span id="favorite-pct">&mdash;</span></p>
 
     <div class="prob-bar" role="img" aria-label="Win probability comparison">
@@ -112,13 +139,19 @@
       <div class="bio-card bio-card-a">
         <span class="bio-flag" id="bio-flag-a"></span>
         <div class="bio-detail">
-          <span class="bio-name" id="bio-name-a"></span>
+          <span class="bio-name-row">
+            <span class="bio-name" id="bio-name-a"></span>
+            <span class="data-badge" id="data-badge-a"></span>
+          </span>
           <span class="bio-line" id="bio-line-a"></span>
         </div>
       </div>
       <div class="bio-card bio-card-b">
         <div class="bio-detail bio-detail-right">
-          <span class="bio-name" id="bio-name-b"></span>
+          <span class="bio-name-row">
+            <span class="data-badge" id="data-badge-b"></span>
+            <span class="bio-name" id="bio-name-b"></span>
+          </span>
           <span class="bio-line" id="bio-line-b"></span>
         </div>
         <span class="bio-flag" id="bio-flag-b"></span>
@@ -142,10 +175,12 @@
       <p id="h2h-unknown" class="h2h-note" hidden>No previous meetings recorded in our dataset.</p>
     </div>
 
-    <p class="disclaimer">Estimated player stats for demonstration purposes &middot; probabilities computed by exact point&rarr;game&rarr;set&rarr;match recursion, not scraped live data.</p>
+    <p class="disclaimer">"Live" players use real service/return points aggregated from their recent matches &middot; everyone else uses hand-curated estimates &middot; probabilities computed by exact point&rarr;game&rarr;set&rarr;match recursion.</p>
   </section>
 
 </main>
+
+<footer class="site-footer">Built on a point&rarr;game&rarr;set&rarr;match probability engine &middot; not affiliated with the ATP or WTA</footer>
 
 <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>

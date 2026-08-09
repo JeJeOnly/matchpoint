@@ -1,36 +1,8 @@
 (function () {
-  const playerA = document.getElementById("player-a");
-  const playerB = document.getElementById("player-b");
-  const playersList = document.getElementById("players-list");
-  const predictBtn = document.getElementById("predict-btn");
-  const errorMsg = document.getElementById("error-msg");
-  const resultCard = document.getElementById("result");
-  const boButtons = Array.from(document.querySelectorAll(".bo-btn"));
-  const previewA = document.getElementById("preview-a");
-  const previewB = document.getElementById("preview-b");
-
-  let bestOf = 3;
+  // --------------------------------------------------------------------
+  // Shared helpers
+  // --------------------------------------------------------------------
   let playersByName = {};
-
-  boButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      boButtons.forEach((b) => b.classList.remove("is-active"));
-      btn.classList.add("is-active");
-      bestOf = Number(btn.dataset.bestOf);
-    });
-  });
-
-  fetch("/api/players")
-    .then((r) => r.json())
-    .then((players) => {
-      playersByName = Object.fromEntries(players.map((p) => [p.name, p]));
-      playersList.innerHTML = players
-        .map((p) => `<option value="${escapeHtml(p.name)}"></option>`)
-        .join("");
-    })
-    .catch(() => {
-      showError("Could not load the player list. Is the server running?");
-    });
 
   function escapeHtml(s) {
     return s.replace(/[&<>"']/g, (c) => ({
@@ -55,6 +27,54 @@
     previewEl.querySelector(".preview-style").textContent = player.style;
     previewEl.hidden = false;
   }
+
+  const SURFACE_LABELS = { hard: "Hard court", clay: "Clay court", grass: "Grass court" };
+
+  function setSurfaceTag(el, surface) {
+    el.textContent = SURFACE_LABELS[surface] || SURFACE_LABELS.hard;
+    el.className = `surface-tag surf-tag-${surface}`;
+  }
+
+  fetch("/api/players")
+    .then((r) => r.json())
+    .then((players) => {
+      playersByName = Object.fromEntries(players.map((p) => [p.name, p]));
+      const options = players.map((p) => `<option value="${escapeHtml(p.name)}"></option>`).join("");
+      document.getElementById("players-list").innerHTML = options;
+    })
+    .catch(() => {
+      showError("Could not load the player list. Is the server running?");
+    });
+
+  // ======================================================================
+  // PRE-MATCH PREDICTOR
+  // ======================================================================
+  const playerA = document.getElementById("player-a");
+  const playerB = document.getElementById("player-b");
+  const predictBtn = document.getElementById("predict-btn");
+  const errorMsg = document.getElementById("error-msg");
+  const resultCard = document.getElementById("result");
+  const previewA = document.getElementById("preview-a");
+  const previewB = document.getElementById("preview-b");
+
+  let bestOf = 3;
+  let surface = "hard";
+
+  document.querySelectorAll("[data-best-of]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("[data-best-of]").forEach((b) => b.classList.remove("is-active"));
+      btn.classList.add("is-active");
+      bestOf = Number(btn.dataset.bestOf);
+    });
+  });
+
+  document.querySelectorAll("[data-surface]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("[data-surface]").forEach((b) => b.classList.remove("is-active"));
+      btn.classList.add("is-active");
+      surface = btn.dataset.surface;
+    });
+  });
 
   playerA.addEventListener("input", () => updatePreview(playerA, previewA));
   playerB.addEventListener("input", () => updatePreview(playerB, previewB));
@@ -92,7 +112,7 @@
       const res = await fetch("/api/predict", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ player_a: a, player_b: b, best_of: bestOf }),
+        body: JSON.stringify({ player_a: a, player_b: b, best_of: bestOf, surface }),
       });
       const data = await res.json();
 
@@ -115,6 +135,8 @@
     const pctB = Math.round(data.prob_b * 1000) / 10;
     const favorite = pctA >= pctB ? data.player_a : data.player_b;
     const favPct = Math.max(pctA, pctB);
+
+    setSurfaceTag(document.getElementById("result-surface-tag"), data.surface);
 
     document.getElementById("favorite-name").textContent = favorite.name;
     document.getElementById("favorite-pct").textContent = `${favPct.toFixed(1)}%`;
@@ -150,6 +172,15 @@
     document.getElementById(`bio-name-${slot}`).textContent = player.name;
     const hand = player.hand === "L" ? "Left-handed" : "Right-handed";
     document.getElementById(`bio-line-${slot}`).textContent = `${player.style} · ${hand}`;
+
+    const badge = document.getElementById(`data-badge-${slot}`);
+    if (player.data_source === "live") {
+      badge.textContent = `Live · ${player.live_matches_used} matches`;
+      badge.className = "data-badge is-live";
+    } else {
+      badge.textContent = "Estimated";
+      badge.className = "data-badge is-estimated";
+    }
   }
 
   function renderH2H(playerAInfo, playerBInfo, h2h) {

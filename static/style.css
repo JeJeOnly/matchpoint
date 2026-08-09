@@ -14,6 +14,12 @@
   --series-b: #d95926;
   --series-b-soft: rgba(217, 89, 38, 0.16);
   --critical: #e66767;
+  --surf-hard: #4f9fdb;
+  --surf-hard-soft: rgba(79, 159, 219, 0.16);
+  --surf-clay: #c1662f;
+  --surf-clay-soft: rgba(193, 102, 47, 0.18);
+  --surf-grass: #4f9d3a;
+  --surf-grass-soft: rgba(79, 157, 58, 0.18);
   --radius-lg: 20px;
   --radius-md: 12px;
   --radius-sm: 8px;
@@ -40,36 +46,94 @@ body {
 .bg-court {
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: -2;
   background:
-    radial-gradient(1200px 600px at 50% -10%, rgba(27, 175, 122, 0.16), transparent 60%),
-    radial-gradient(900px 500px at 90% 10%, rgba(57, 135, 229, 0.10), transparent 55%),
-    radial-gradient(900px 500px at 5% 30%, rgba(217, 89, 38, 0.08), transparent 55%),
+    radial-gradient(1200px 600px at 50% -10%, rgba(27, 175, 122, 0.18), transparent 60%),
+    radial-gradient(900px 500px at 90% 10%, rgba(57, 135, 229, 0.12), transparent 55%),
+    radial-gradient(900px 500px at 5% 30%, rgba(217, 89, 38, 0.09), transparent 55%),
     var(--page);
+}
+
+.bg-lines {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: radial-gradient(700px 420px at 50% 0%, black, transparent 75%);
+  mask-image: radial-gradient(700px 420px at 50% 0%, black, transparent 75%);
 }
 
 .top {
   max-width: 880px;
   margin: 0 auto;
-  padding: 56px 24px 8px;
+  padding: 60px 24px 8px;
   text-align: center;
 }
 
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  gap: 12px;
 }
 
-.brand-mark { font-size: 1.4rem; filter: saturate(1.1); }
+.brand-ball {
+  display: inline-flex;
+  filter: drop-shadow(0 6px 14px rgba(169, 217, 43, 0.35));
+  animation: ball-spin 7s linear infinite;
+}
+
+@keyframes ball-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.brand-name {
+  margin: 0;
+  font-size: 2.1rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.brand-accent {
+  background: linear-gradient(120deg, var(--accent), var(--series-a));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
 
 .tagline {
-  margin: 10px 0 0;
+  margin: 14px auto 0;
+  max-width: 560px;
   color: var(--text-secondary);
-  font-size: 0.98rem;
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.badge-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
 }
 
 .wrap {
@@ -87,6 +151,55 @@ body {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
   padding: 28px;
+}
+
+.surface-picker {
+  display: inline-flex;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  gap: 4px;
+}
+
+.surf-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 9px 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.surf-btn:hover { color: var(--text-primary); }
+
+.surf-btn.surf-hard.is-active { background: var(--surf-hard); color: #061420; }
+.surf-btn.surf-clay.is-active { background: var(--surf-clay); color: #1f0d02; }
+.surf-btn.surf-grass.is-active { background: var(--surf-grass); color: #051a03; }
+
+.surface-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 auto 14px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+
+.surf-tag-hard { background: var(--surf-hard-soft); color: var(--surf-hard); }
+.surf-tag-clay { background: var(--surf-clay-soft); color: var(--surf-clay); }
+.surf-tag-grass { background: var(--surf-grass-soft); color: var(--surf-grass); }
+
+.result-card .surface-tag {
+  display: flex;
+  width: fit-content;
 }
 
 .picker-grid {
@@ -388,6 +501,54 @@ body {
 .bio-detail { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .bio-detail-right { align-items: flex-end; text-align: right; }
 
+.bio-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.bio-detail-right .bio-name-row { flex-direction: row-reverse; }
+
+.data-badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+
+.data-badge:empty { display: none; }
+
+.data-badge.is-live {
+  color: var(--accent);
+  background: rgba(27, 175, 122, 0.14);
+}
+
+.data-badge.is-live::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+.data-badge.is-estimated {
+  color: var(--text-muted);
+  background: var(--surface-2);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
 .bio-name {
   font-weight: 700;
   font-size: 0.88rem;
@@ -460,6 +621,15 @@ body {
   line-height: 1.5;
 }
 
+.site-footer {
+  max-width: 880px;
+  margin: 40px auto 0;
+  padding: 0 24px;
+  text-align: center;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
 @media (max-width: 560px) {
   .picker-grid { grid-template-columns: 1fr; }
   .vs-col { padding: 0; }
@@ -468,4 +638,5 @@ body {
   .bio-grid { grid-template-columns: 1fr; }
   .bio-card-b { flex-direction: row; }
   .bio-detail-right { align-items: flex-start; text-align: left; }
+  .brand-name { font-size: 1.6rem; }
 }
