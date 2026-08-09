@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MatchPoint &mdash; Tennis Win Predictor</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="bg-court" aria-hidden="true"></div>
+
+<header class="top">
+  <div class="brand">
+    <span class="brand-mark">&#127934;</span>
+    <span class="brand-name">MatchPoint</span>
+  </div>
+  <p class="tagline">Head-to-head win probability, built from a point-by-point tennis simulation.</p>
+</header>
+
+<main class="wrap">
+
+  <section class="card picker-card">
+    <div class="picker-grid">
+
+      <div class="player-col" data-slot="a">
+        <label class="slot-label slot-a" for="player-a">Player A</label>
+        <input id="player-a" class="player-input" list="players-list" placeholder="Start typing a name&hellip;" autocomplete="off">
+        <div id="preview-a" class="player-preview" hidden>
+          <span class="preview-flag"></span>
+          <span class="preview-text">
+            <span class="preview-country"></span>
+            <span class="preview-style"></span>
+          </span>
+        </div>
+      </div>
+
+      <div class="vs-col">
+        <span class="vs">VS</span>
+      </div>
+
+      <div class="player-col" data-slot="b">
+        <label class="slot-label slot-b" for="player-b">Player B</label>
+        <input id="player-b" class="player-input" list="players-list" placeholder="Start typing a name&hellip;" autocomplete="off">
+        <div id="preview-b" class="player-preview" hidden>
+          <span class="preview-flag"></span>
+          <span class="preview-text">
+            <span class="preview-country"></span>
+            <span class="preview-style"></span>
+          </span>
+        </div>
+      </div>
+
+    </div>
+
+    <datalist id="players-list"></datalist>
+
+    <div class="controls-row">
+      <div class="best-of" role="radiogroup" aria-label="Match format">
+        <button type="button" class="bo-btn is-active" data-best-of="3">Best of 3</button>
+        <button type="button" class="bo-btn" data-best-of="5">Best of 5</button>
+      </div>
+      <button id="predict-btn" class="predict-btn" type="button">
+        <span>Predict winner</span>
+      </button>
+    </div>
+
+    <p id="error-msg" class="error-msg" hidden></p>
+  </section>
+
+  <section id="result" class="card result-card" hidden>
+
+    <p class="result-headline"><span id="favorite-name">&mdash;</span> favored to win, <span id="favorite-pct">&mdash;</span></p>
+
+    <div class="prob-bar" role="img" aria-label="Win probability comparison">
+      <div id="bar-a" class="prob-bar-seg prob-bar-a" style="width:50%"></div>
+      <div id="bar-b" class="prob-bar-seg prob-bar-b" style="width:50%"></div>
+      <div id="bar-split" class="prob-bar-split" style="left:50%"></div>
+    </div>
+
+    <div class="prob-labels">
+      <div class="prob-label prob-label-a">
+        <span class="swatch swatch-a"></span>
+        <span id="name-a" class="pname">Player A</span>
+        <span id="pct-a" class="pct">50%</span>
+      </div>
+      <div class="prob-label prob-label-b">
+        <span id="pct-b" class="pct">50%</span>
+        <span id="name-b" class="pname">Player B</span>
+        <span class="swatch swatch-b"></span>
+      </div>
+    </div>
+
+    <div class="stats-table">
+      <div class="stats-row stats-head">
+        <span></span><span>Serve pts won</span><span>Return pts won</span><span>Per-point serve edge</span>
+      </div>
+      <div class="stats-row" id="stats-row-a">
+        <span class="stats-name stats-name-a"></span>
+        <span class="stat-spw-a"></span>
+        <span class="stat-rpw-a"></span>
+        <span class="stat-p-a"></span>
+      </div>
+      <div class="stats-row" id="stats-row-b">
+        <span class="stats-name stats-name-b"></span>
+        <span class="stat-spw-b"></span>
+        <span class="stat-rpw-b"></span>
+        <span class="stat-p-b"></span>
+      </div>
+    </div>
+
+    <div class="bio-grid">
+      <div class="bio-card bio-card-a">
+        <span class="bio-flag" id="bio-flag-a"></span>
+        <div class="bio-detail">
+          <span class="bio-name" id="bio-name-a"></span>
+          <span class="bio-line" id="bio-line-a"></span>
+        </div>
+      </div>
+      <div class="bio-card bio-card-b">
+        <div class="bio-detail bio-detail-right">
+          <span class="bio-name" id="bio-name-b"></span>
+          <span class="bio-line" id="bio-line-b"></span>
+        </div>
+        <span class="bio-flag" id="bio-flag-b"></span>
+      </div>
+    </div>
+
+    <div id="h2h" class="h2h-block">
+      <p class="h2h-title">Head-to-head</p>
+      <div id="h2h-known" hidden>
+        <div class="h2h-bar" role="img" aria-label="Head-to-head record">
+          <div id="h2h-bar-a" class="h2h-bar-seg h2h-bar-a"></div>
+          <div id="h2h-bar-b" class="h2h-bar-seg h2h-bar-b"></div>
+        </div>
+        <p class="h2h-record">
+          <span id="h2h-record-a" class="h2h-record-a"></span>
+          <span class="h2h-sep">&middot;</span>
+          <span id="h2h-record-b" class="h2h-record-b"></span>
+        </p>
+        <p class="h2h-note">Career meetings on record in our dataset &mdash; may not include the most recent matches.</p>
+      </div>
+      <p id="h2h-unknown" class="h2h-note" hidden>No previous meetings recorded in our dataset.</p>
+    </div>
+
+    <p class="disclaimer">Estimated player stats for demonstration purposes &middot; probabilities computed by exact point&rarr;game&rarr;set&rarr;match recursion, not scraped live data.</p>
+  </section>
+
+</main>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
